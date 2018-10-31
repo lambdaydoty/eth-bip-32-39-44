@@ -71,9 +71,9 @@ function broadcasting (sTx) {
 }
 
 
-const amountToSend = '0.001' // in Ether!
+const amountToSend = '0.008' // in Ether!
 const params = {
-  nonce: 4, // inc
+  nonce: 5, // inc
   to: '0x65998E33686bF76b1Ee444a97883C85Dc5144DB2',
   value: Web3.utils.toHex(
     Web3.utils.toWei(amountToSend, 'ether')

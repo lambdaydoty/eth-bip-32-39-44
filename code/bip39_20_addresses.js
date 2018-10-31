@@ -2,9 +2,10 @@ const bip39 = require('bip39')
 const hdkey = require('hdkey')
 const ethUtil = require('ethereumjs-util')
 
-const mnemonic = bip39.generateMnemonic();
+// const mnemonic = bip39.generateMnemonic();
+const MNEMONIC = require('fs').readFileSync('./mnemonic', 'utf8').trim()
 
-const seed = bip39.mnemonicToSeed(mnemonic);
+const seed = bip39.mnemonicToSeed(MNEMONIC);
 
 const root = hdkey.fromMasterSeed(seed);
 const masterPrivateKey = root.privateKey.toString('hex');
@@ -24,7 +25,7 @@ const chain = [
 	ethUtil.toChecksumAddress,
 ].reduce(_pipe)
 
-console.log({mnemonic})
+console.log({MNEMONIC})
 for (let i = 0; i < 20; ++i) {
   console.log(chain(i))
 }
