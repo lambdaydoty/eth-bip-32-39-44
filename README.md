@@ -5,3 +5,6 @@ JS example code following bip-32, bip-39, and bip-44 in Ethereum
 * bip-44: ```m/44'/60'/0'/0/0```
 * provider: https://infura.io
 * web3js: ```npm install web3``` (1.0.0)
+
+## Reference
+* https://medium.com/bitcraft/so-you-want-to-build-an-ethereum-hd-wallet-cb2b7d7e4998
