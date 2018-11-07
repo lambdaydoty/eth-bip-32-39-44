@@ -2,8 +2,6 @@ const bip39 = require('bip39')
 const hdkey = require('hdkey')
 const ethUtil = require('ethereumjs-util')
 
-const mnemonic = bip39.generateMnemonic();
-
 function m2a (mnemonic) {
   const _pipe = (f,g) => x => g(f(x))
   const _toHexStr = x => x.toString('hex')

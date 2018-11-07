@@ -3,14 +3,18 @@ const hdkey = require('hdkey')
 const ethUtil = require('ethereumjs-util')
 const ethTx = require('ethereumjs-tx')
 const Web3 = require('web3')
+const fs = require('fs')
+require('dotenv').config()
 
 // const MNEMONIC = bip39.generateMnemonic();
-// const accX = {
-//   mnemonic: "guitar buddy inflict rain robust near force type jeans social blush chunk",
-//   address: "0x2f9C0Ebc27071904378984b4E69b1fB69C41E232"
-// }
-const MNEMONIC = require('fs').readFileSync('./mnemonic', 'utf8').trim()
+const {
+  MNEMONIC,
+  NONCE,
+  PROVIDER,
+  CHAIN_ID
+} = process.env
 
+/* function: mnemonic to address0 */
 function m2a (mnemonic) {
   const _pipe = (f,g) => x => g(f(x))
   const _toHexStr = x => x.toString('hex')
@@ -27,6 +31,7 @@ function m2a (mnemonic) {
   return chain(mnemonic)
 }
 
+/* function: mnemonic to private-key0 */
 function m2priv(mnemonic) {
   const _pipe = (f,g) => x => g(f(x))
   const _toHexStr = x => x.toString('hex')
@@ -39,9 +44,13 @@ function m2priv(mnemonic) {
   return chain(mnemonic)
 }
 
-function constructing(params) {
-  const tx = new ethTx(params)
-  return tx
+function constructing (nonce) {
+  params.nonce = Web3.utils.toHex(nonce)
+  console.log(params)
+  return function (params) {
+    const tx = new ethTx(params)
+    return tx
+  }
 }
 
 function signing (priv) {
@@ -53,10 +62,8 @@ function signing (priv) {
 }
 
 function broadcasting (sTx) {
-  const API_KEY = require('fs').readFileSync('./api_key', 'utf8').trim()
-  const ENDPOINT = `https://ropsten.infura.io/${API_KEY}`
   const web3 = new Web3(
-    new Web3.providers.HttpProvider(ENDPOINT)
+    new Web3.providers.HttpProvider(PROVIDER)
   )
   web3.eth.net.isListening()
     .then(() => console.log('is connected'))
@@ -71,20 +78,59 @@ function broadcasting (sTx) {
 }
 
 
-const amountToSend = '0.008' // in Ether!
+function incEnvNonce() {
+  const envfile = './.env'
+  fs.readFile(envfile, 'utf8', function (err, data) {
+    if (err) {
+      return console.log(err)
+    }
+
+    let oldStr = `NONCE=${parseInt(NONCE, 10)}`
+    let newStr = `NONCE=${parseInt(NONCE, 10)+1}`
+    let result = data.replace(new RegExp(oldStr, 'g'), newStr)
+
+    fs.writeFile(envfile, result, 'utf8', function (err) {
+      if (err) {
+        return console.log(err)
+      }
+    })
+  })
+}
+
+
+const amountToSend = '0.008' // (Ether)
+// const amountToSend = '0' // (Ether)
+const accountToSend = '0xaF386d520D65fA60473cd893845d53e77a3A9DF6'
+// const accountToSend = '0x65998E33686bF76b1Ee444a97883C85Dc5144DB2'
 const params = {
-  nonce: 5, // inc
-  to: '0x65998E33686bF76b1Ee444a97883C85Dc5144DB2',
+  // nonce: NONCE,
+  to: accountToSend,
   value: Web3.utils.toHex(
     Web3.utils.toWei(amountToSend, 'ether')
   ),
-  gasPrice: 5000000000,
+  gasPrice: 8000000000, // 8 Gwei
   gasLimit: 21000,
-  chainId: 3 // Ropsten
+  chainId: parseInt(CHAIN_ID) // Ropsten
 }
 
-broadcasting(
-  signing(m2priv(MNEMONIC))(
-    constructing(params)
-  )
+
+const web3 = new Web3(
+  new Web3.providers.HttpProvider(PROVIDER)
 )
+web3.eth.net.isListening()
+  .then(() => console.log('is connected'))
+  .catch(e => console.log('sth wrong'))
+web3.eth.getTransactionCount(m2a(MNEMONIC))
+  .then(count => {
+    console.log({count})
+    console.log({count: parseInt(count, 16)})
+    broadcasting(
+      signing(m2priv(MNEMONIC))(
+        constructing(NONCE+1)(
+          params
+        )
+      )
+    )
+  })
+
+// incEnvNonce()

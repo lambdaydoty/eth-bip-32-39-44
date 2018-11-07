@@ -1,23 +1,24 @@
 const bip39 = require('bip39')
 const hdkey = require('hdkey')
 const ethUtil = require('ethereumjs-util')
+require('dotenv').config()
 
-// const mnemonic = bip39.generateMnemonic();
-const MNEMONIC = require('fs').readFileSync('./mnemonic', 'utf8').trim()
-
+// const MNEMONIC = bip39.generateMnemonic();
+const { MNEMONIC } = process.env
 const seed = bip39.mnemonicToSeed(MNEMONIC);
+const ROOT = hdkey.fromMasterSeed(seed);
 
-const root = hdkey.fromMasterSeed(seed);
-const masterPrivateKey = root.privateKey.toString('hex');
+const masterPrivateKey = ROOT.privateKey.toString('hex');
 
-const addrNode = root.derive("m/44'/60'/0'/0/0")
+const addrNode = ROOT.derive("m/44'/60'/0'/0/0")
 const pubKey = ethUtil.privateToPublic(addrNode._privateKey);
 const addr = ethUtil.publicToAddress(pubKey).toString('hex');
 const address = ethUtil.toChecksumAddress(addr);
 
+/* refactor... */
 const _pipe = (f,g) => x => g(f(x))
 const chain = [
-	x => root.derive(`m/44'/60'/0'/0/${x}`),
+	x => ROOT.derive(`m/44'/60'/0'/0/${x}`),
 	x => x._privateKey,
 	ethUtil.privateToPublic,
 	ethUtil.publicToAddress,
