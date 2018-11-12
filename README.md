@@ -7,7 +7,7 @@ JS example code following bip-32, bip-39, and bip-44 in Ethereum
 * web3js: ```npm install web3``` (1.0.0)
 
 ## Reference
-* [web3@1.x](https://web3js.readthedocs.io/en/1.0/getting-started.html): Async cb, Async **Promises** or event emitter
+* [web3@1.x](https://web3js.readthedocs.io/en/1.0/getting-started.html): Async cb, Async **Promises** or event emitter [priv2account](https://ethereum.stackexchange.com/questions/30033/injecting-a-private-key-into-web3-js-execution-context)
 * [web3@0.2](https://github.com/ethereum/wiki/wiki/JavaScript-API#getting-started): Sync HTTP or Async cb
 * truffle-based
     * [truffle-hdwallet-provider](https://github.com/trufflesuite/truffle-hdwallet-provider#truffle-hdwallet-provider)
